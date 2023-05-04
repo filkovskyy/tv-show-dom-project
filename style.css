@@ -2,19 +2,26 @@
   color: black;
   background-color: rgba(255, 255, 255, 1);
   font-size: 16px;
+  overflow-x: hidden;
+  position: relative;
 }
 
-.global {
+* {
+  font-family: 'Arial', sans-serif;
+}
+
+.grid-container {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 10px;
   justify-content: center;
   align-content: center;
+  margin: 50px;
 }
 
 h2 {
-  font-family: 'Franklin Gothic Medium' sans-serif;
   font-size: 20px;
-  padding: 10px;
+  padding: 10px 0;
   border: 1px solid black;
   border-radius: 15px;
   text-align: center;
@@ -29,8 +36,7 @@ a {
 .post-container {
   min-height: max-content;
   height: 35rem;
-  width: 100%;
-  max-width: 400px;
+  width: 400px;
   background-color: rgba(128, 128, 128, 0.2);
   border-radius: 10px;
   display: flex;
@@ -40,4 +46,38 @@ a {
   margin: 20px 50px;
   padding: 0 20px 0 20px;
   justify-self: center;
+}
+
+/* Nav */
+
+nav {
+  width: 100%;
+  height: 50px;
+  position: absolute;
+  background-color: antiquewhite;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 0 10px;
+}
+
+.searching-container {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+#searchBtn {
+  border-radius: 0 8px 8px 0;
+  border: none;
+  background-color: rgba(128, 128, 128, 0.2);
+}
+
+input {
+  height: 30px;
+  border: none;
+  border-radius: 8px 0 0 8px;
+  outline: none;
+  font-size: 18px;
+  padding: 0 10px;
+  margin-left: 10px;
 }

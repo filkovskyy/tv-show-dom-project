@@ -10,8 +10,14 @@
 
   <body>
     <div id="root">
-      <h1></h1>
-      <div class="global"></div>
+      <nav>
+        <div class="searching-container">
+          <button id="searchBtn" class="fa-solid fa-search"></button>
+          <input id="search" type="text" placeholder="Search..." />
+        </div>
+        <p id="number_of_episodes"></p>
+      </nav>
+      <div class="grid-container"></div>
       Data is supplied by
       <a style="text-decoration: underline" href="https://www.tvmaze.com/"
         >TVMaze.com</a
@@ -19,6 +25,10 @@
     </div>
     <!-- Loads a provided function called getAllEpisodes() which returns all episodes -->
     <script src="episodes.js"></script>
+    <script
+      src="https://kit.fontawesome.com/fe2fe709c9.js"
+      crossorigin="anonymous"
+    ></script>
 
     <!-- Loads YOUR javascript code -->
     <script src="script.js"></script>
