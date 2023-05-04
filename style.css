@@ -72,7 +72,8 @@ nav {
   background-color: rgba(128, 128, 128, 0.2);
 }
 
-input {
+input,
+#episode_selector {
   height: 30px;
   border: none;
   border-radius: 8px 0 0 8px;
@@ -80,4 +81,8 @@ input {
   font-size: 18px;
   padding: 0 10px;
   margin-left: 10px;
+}
+
+#episode_selector {
+  border-radius: 8px;
 }
