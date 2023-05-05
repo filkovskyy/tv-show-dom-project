@@ -34,8 +34,7 @@ a {
   color: black;
 }
 .post-container {
-  min-height: max-content;
-  height: 35rem;
+  min-height: fit-content;
   width: 400px;
   background-color: rgba(128, 128, 128, 0.2);
   border-radius: 10px;
@@ -66,6 +65,11 @@ nav {
   flex-direction: row-reverse;
 }
 
+.selection-container {
+  display: flex;
+  align-items: space-between;
+}
+
 #searchBtn {
   border-radius: 0 8px 8px 0;
   border: none;
@@ -73,7 +77,8 @@ nav {
 }
 
 input,
-#episode_selector {
+#episode_selector,
+#show_selector {
   height: 30px;
   border: none;
   border-radius: 8px 0 0 8px;
@@ -83,6 +88,12 @@ input,
   margin-left: 10px;
 }
 
-#episode_selector {
+#episode_selector,
+#show_selector {
   border-radius: 8px;
+}
+
+.selected {
+  background-color: #fcb9b2;
+  color: white;
 }
