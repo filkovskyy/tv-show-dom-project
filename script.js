@@ -3,7 +3,7 @@ const showAPIs = [
   'https://api.tvmaze.com/shows/527/episodes',
   'https://api.tvmaze.com/shows/22036/episodes',
   'https://api.tvmaze.com/shows/5/episodes',
-  'https://api.tvmaze.com/shows/582/episodes',
+  'https://api.tvmaze.com/shows/583/episodes',
   'https://api.tvmaze.com/shows/179/episodes',
   'https://api.tvmaze.com/shows/379/episodes',
   'https://api.tvmaze.com/shows/4729/episodes',
@@ -33,23 +33,24 @@ async function setup() {
   try {
     const episodesData = await fetchEpisodes(showAPIs)
     const episodesDataArr = [...episodesData]
-    console.log(episodesDataArr)
+    let allEpisodes = []
+    for (let i = 0; i < episodesDataArr.length; i++) {
+      allEpisodes = allEpisodes.concat(episodesDataArr[i])
+    }
 
     const showData = await fetchShowInfo(showAPIs)
     const showDataArr = [...showData]
     const allShows = showDataArr.map((show) => [show.name, show.id])
 
-    console.log(allShows)
     const globalContainer = document.querySelector('.grid-container')
     const input = document.getElementById('search')
-    const numOfEpisodes = document.querySelector('#number_of_episodes')
     input.addEventListener('input', () => search(input))
-    numOfEpisodes.innerHTML = `Displaying ${episodesData.length}/${episodesDataArr[1].length} episodes`
-    episodesDataArr[1].forEach((data) => renderElements(data, globalContainer))
+    setNumberOfEpisodes(allEpisodes)
+    allEpisodes.forEach((data) => renderElements(data, globalContainer))
 
     // Setting values for drop-down menus
     setShowsDropMenu(allShows)
-    setDropDownMenuAndScrollToElement(episodesDataArr[1])
+    setDropDownMenuAndScrollToElement(allEpisodes)
   } catch (error) {
     console.log(error)
   }
@@ -59,7 +60,10 @@ async function setup() {
 function formatSeriesNumber(number) {
   return number < 10 ? '0' + number : number
 }
-
+function setNumberOfEpisodes(dataArr) {
+  const numOfEpisodes = document.querySelector('#number_of_episodes')
+  numOfEpisodes.innerHTML = `Displaying ${dataArr.length}/${dataArr.length} episodes`
+}
 // Function to search for episodes
 function search({ value: inputValue }) {
   const filter = inputValue.toUpperCase().trim()
@@ -93,13 +97,17 @@ function renderElements(element, parentElement) {
   const description = document.createElement('p')
   dataEl.setAttribute('id', element.id)
   dataEl.setAttribute('class', 'post-container')
-  if (element.image.medium) {
-    image.setAttribute('src', element.image.medium)
-  } else {
-    image.setAttribute(
-      'src',
-      'https://static.tvmaze.com/images/no-img/no-img-portrait-text.png'
-    )
+  try {
+    if (element.image.medium != null) {
+      image.setAttribute('src', element.image.medium)
+    } else {
+      image.setAttribute(
+        'src',
+        'https://static.tvmaze.com/images/no-img/no-img-portrait-text.png'
+      )
+    }
+  } catch (err) {
+    console.log(err)
   }
   link.setAttribute('href', element.url)
   link.innerHTML = `${element.name} - S${formatSeriesNumber(
@@ -113,10 +121,17 @@ function renderElements(element, parentElement) {
   dataEl.append(description)
 }
 
+function deleteAllChildren(parentEl) {
+  while (parentEl.firstChild) {
+    parentEl.removeChild(parentEl.firstChild)
+  }
+}
+
 async function setShowsDropMenu(shows) {
   const globalContainer = document.querySelector('.grid-container')
-
   const select = document.querySelector('#show_selector')
+  const episodeSelector = document.querySelector('#episode_selector')
+  shows.sort()
   shows.forEach((show) => {
     let option = document.createElement('option')
     option.setAttribute('value', show[1])
@@ -130,7 +145,11 @@ async function setShowsDropMenu(shows) {
     )
     let episodes = await res.json()
     console.log(episodes)
-    renderElements(episodes, globalContainer)
+    deleteAllChildren(globalContainer)
+    deleteAllChildren(episodeSelector)
+    episodes.forEach((episode) => renderElements(episode, globalContainer))
+    setDropDownMenuAndScrollToElement(episodes)
+    setNumberOfEpisodes(episodes)
   })
 }
 
@@ -158,7 +177,12 @@ function setDropDownMenuAndScrollToElement(episodes) {
         )}` === select.value
     )
     const selectedEl = document.getElementById(`${episode.id}`)
-    selectedEl.scrollIntoView({ behavior: 'smooth' })
+    console.log(selectedEl)
+    try {
+      selectedEl.scrollIntoView({ behavior: 'smooth' })
+    } catch (err) {
+      console.log(err)
+    }
     highlightSelected(selectedEl)
   })
 }
