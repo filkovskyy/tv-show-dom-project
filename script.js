@@ -6,7 +6,7 @@ const showAPIs = [
   'https://api.tvmaze.com/shows/583/episodes',
   'https://api.tvmaze.com/shows/179/episodes',
   'https://api.tvmaze.com/shows/379/episodes',
-  'https://api.tvmaze.com/shows/4729/episodes',
+  'https://api.tvmaze.com/shows/590/episodes',
 ]
 
 async function fetchEpisodes(api) {
@@ -41,6 +41,7 @@ async function setup() {
     const showData = await fetchShowInfo(showAPIs)
     const showDataArr = [...showData]
     const allShows = showDataArr.map((show) => [show.name, show.id])
+    console.log(allShows)
 
     const globalContainer = document.querySelector('.grid-container')
     const input = document.getElementById('search')
@@ -98,22 +99,23 @@ function renderElements(element, parentElement) {
   dataEl.setAttribute('id', element.id)
   dataEl.setAttribute('class', 'post-container')
   try {
-    if (element.image.medium != null) {
-      image.setAttribute('src', element.image.medium)
-    } else {
-      image.setAttribute(
-        'src',
-        'https://static.tvmaze.com/images/no-img/no-img-portrait-text.png'
-      )
-    }
+    image.setAttribute('src', element.image.medium)
+    description.innerHTML = element.summary
   } catch (err) {
-    console.log(err)
+    image.setAttribute(
+      'src',
+      'https://static.tvmaze.com/images/no-img/no-img-portrait-text.png'
+    )
+    description.innerHTML =
+      'Description information is not available. Sorry for inconvenience'
+
+    console.log("Coudn't load image")
   }
   link.setAttribute('href', element.url)
   link.innerHTML = `${element.name} - S${formatSeriesNumber(
     element.season
   )}E${formatSeriesNumber(element.number)}`
-  description.innerHTML = element.summary
+  // description.innerHTML = element.summary
   parentElement.append(dataEl)
   dataEl.append(title)
   title.append(link)
