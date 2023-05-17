@@ -41,13 +41,15 @@ async function setup() {
     const showData = await fetchShowInfo(showAPIs)
     const showDataArr = [...showData]
     const allShows = showDataArr.map((show) => [show.name, show.id])
-    console.log(allShows)
+    console.log(showDataArr)
 
-    const globalContainer = document.querySelector('.grid-container')
+    const showContainer = document.querySelector('.show-box')
+    const gridContainer = document.querySelector('.grid-container')
     const input = document.getElementById('search')
     input.addEventListener('input', () => search(input))
     setNumberOfEpisodes(allEpisodes)
-    allEpisodes.forEach((data) => renderElements(data, globalContainer))
+    // allEpisodes.forEach((data) => renderElements(data, gridContainer))
+    showDataArr.forEach((data) => renderShows(data, showContainer, showDataArr))
 
     // Setting values for drop-down menus
     setShowsDropMenu(allShows)
@@ -61,6 +63,11 @@ async function setup() {
 function formatSeriesNumber(number) {
   return number < 10 ? '0' + number : number
 }
+function setNumberOfShows(data) {
+  const numOfShows = document.querySelector('#number_of_shows')
+  numOfShows.innerHTML = `Displaying ${data.length}/${data.length} episodes`
+}
+
 function setNumberOfEpisodes(dataArr) {
   const numOfEpisodes = document.querySelector('#number_of_episodes')
   numOfEpisodes.innerHTML = `Displaying ${dataArr.length}/${dataArr.length} episodes`
@@ -89,18 +96,74 @@ function search({ value: inputValue }) {
   })
 }
 
+function renderShows(data, parentElement, showsArr) {
+  const numOfEpisodes = document.querySelector('#number_of_episodes')
+  numOfEpisodes.style.display = 'none'
+  setNumberOfShows(showsArr)
+  const showEl = Object.assign(document.createElement('div'), {
+    className: 'show-container',
+  })
+  const showDescription = Object.assign(document.createElement('div'), {
+    className: 'show-description',
+  })
+  const showTitle = Object.assign(document.createElement('p'), {
+    className: 'show-title',
+  })
+  const showLink = Object.assign(document.createElement('a'), {
+    href: data.url,
+  })
+  const showSummary = Object.assign(document.createElement('p'), {
+    className: 'show-summary',
+  })
+
+  const showImage = Object.assign(document.createElement('img'), {
+    src: data.image.medium,
+  })
+  const showDetails = Object.assign(document.createElement('div'), {
+    className: 'show-details',
+  })
+  const showRating = document.createElement('p')
+  const showGenre = document.createElement('p')
+  const showStatus = document.createElement('p')
+  const showLanguage = document.createElement('p')
+
+  showLink.innerHTML = data.name
+  showRating.innerHTML = `Rating : ${data.rating.average}`
+  showGenre.innerHTML = `Genres : ${data.genres.join(' | ')}`
+  showStatus.innerHTML = `Status : ${data.status}`
+  showLanguage.innerHTML = `Language : ${data.language}`
+  showSummary.innerHTML = data.summary
+
+  parentElement.append(showEl)
+  showEl.append(showImage)
+  showEl.append(showDescription)
+  showEl.append(showDetails)
+  showDescription.append(showTitle)
+  showDescription.append(showSummary)
+  showDetails.append(showRating)
+  showDetails.append(showGenre)
+  showDetails.append(showStatus)
+  showDetails.append(showLanguage)
+  showTitle.append(showLink)
+}
+
 // Function to render the elements on the page
-function renderElements(element, parentElement) {
-  const dataEl = document.createElement('div')
+function renderElements(data, parentElement) {
+  const numOfShows = document.querySelector('#number_of_shows')
+  const numOfEpisodes = document.querySelector('#number_of_episodes')
+  numOfShows.style.display = 'none'
+  numOfEpisodes.style.display = 'inline'
+  const dataEl = Object.assign(document.createElement('div'), {
+    className: 'post-container',
+    id: data.id,
+  })
   const title = document.createElement('h2')
-  const link = document.createElement('a')
+  const link = Object.assign(document.createElement('a'), { href: data.url })
   const image = document.createElement('img')
   const description = document.createElement('p')
-  dataEl.setAttribute('id', element.id)
-  dataEl.setAttribute('class', 'post-container')
   try {
-    image.setAttribute('src', element.image.medium)
-    description.innerHTML = element.summary
+    image.setAttribute('src', data.image.medium)
+    description.innerHTML = data.summary
   } catch (err) {
     image.setAttribute(
       'src',
@@ -111,11 +174,10 @@ function renderElements(element, parentElement) {
 
     console.log("Coudn't load image")
   }
-  link.setAttribute('href', element.url)
-  link.innerHTML = `${element.name} - S${formatSeriesNumber(
+  link.innerHTML = `${data.name} - S${formatSeriesNumber(
     element.season
-  )}E${formatSeriesNumber(element.number)}`
-  // description.innerHTML = element.summary
+  )}E${formatSeriesNumber(data.number)}`
+  // description.innerHTML = data.summary
   parentElement.append(dataEl)
   dataEl.append(title)
   title.append(link)
@@ -130,7 +192,7 @@ function deleteAllChildren(parentEl) {
 }
 
 async function setShowsDropMenu(shows) {
-  const globalContainer = document.querySelector('.grid-container')
+  const gridContainer = document.querySelector('.grid-container')
   const select = document.querySelector('#show_selector')
   const episodeSelector = document.querySelector('#episode_selector')
   shows.sort()
@@ -147,9 +209,9 @@ async function setShowsDropMenu(shows) {
     )
     let episodes = await res.json()
     console.log(episodes)
-    deleteAllChildren(globalContainer)
+    deleteAllChildren(gridContainer)
     deleteAllChildren(episodeSelector)
-    episodes.forEach((episode) => renderElements(episode, globalContainer))
+    episodes.forEach((episode) => renderElements(episode, gridContainer))
     setDropDownMenuAndScrollToElement(episodes)
     setNumberOfEpisodes(episodes)
   })
