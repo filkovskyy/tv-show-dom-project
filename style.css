@@ -28,11 +28,18 @@
   margin: 60px 10px 0 10px;
   padding: 20px;
   /* border: 1px solid black; */
-  border-radius: 0 15px 15px 0;
+  border-radius: 15px;
   display: flex;
   box-shadow: 5px 5px 5px 5px rgba(128, 128, 128, 0.5);
   justify-content: space-evenly;
+
   /* flex-direction: row-reverse; */
+}
+
+.show-poster {
+  /* border-radius: 0 15px 15px 0; */
+  border-radius: 15px 0 0 15px;
+  box-shadow: 5px 5px 5px 5px rgba(128, 128, 128, 0.5);
 }
 
 .show-details {
@@ -50,8 +57,9 @@
   margin-left: 15px;
 }
 .show-description {
-  margin: 10px;
+  margin: 15px;
   text-align: justify;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.5);
 }
 .show-summary {
   text-indent: 20px;
@@ -124,6 +132,20 @@ input,
   font-size: 18px;
   padding: 0 10px;
   margin-left: 10px;
+  min-width: 185px;
+}
+#home_btn {
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  padding: 0 10px;
+  background: #fff;
+}
+
+#home_btn:hover {
+  background: #fcb9b2;
+  transform: translateX(0);
+  transition: ease 0.2s;
 }
 
 #episode_selector,

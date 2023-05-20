@@ -1,3 +1,12 @@
+const showContainer = document.querySelector('.show-box')
+const gridContainer = document.querySelector('.grid-container')
+const input = document.getElementById('search')
+const numOfShows = document.querySelector('#number_of_shows')
+const numOfEpisodes = document.querySelector('#number_of_episodes')
+const showSelector = document.querySelector('#show_selector')
+const episodeSelector = document.querySelector('#episode_selector')
+const homeBtn = document.querySelector('#home_btn')
+
 const showAPIs = [
   'https://api.tvmaze.com/shows/82/episodes',
   'https://api.tvmaze.com/shows/527/episodes',
@@ -5,7 +14,7 @@ const showAPIs = [
   'https://api.tvmaze.com/shows/5/episodes',
   'https://api.tvmaze.com/shows/583/episodes',
   'https://api.tvmaze.com/shows/179/episodes',
-  'https://api.tvmaze.com/shows/379/episodes',
+  'https://api.tvmaze.com/shows/528/episodes',
   'https://api.tvmaze.com/shows/590/episodes',
 ]
 
@@ -31,45 +40,43 @@ async function fetchShowInfo(api) {
 
 async function setup() {
   try {
-    const episodesData = await fetchEpisodes(showAPIs)
-    const episodesDataArr = [...episodesData]
-    let allEpisodes = []
-    for (let i = 0; i < episodesDataArr.length; i++) {
-      allEpisodes = allEpisodes.concat(episodesDataArr[i])
-    }
-
     const showData = await fetchShowInfo(showAPIs)
     const showDataArr = [...showData]
     const allShows = showDataArr.map((show) => [show.name, show.id])
     console.log(showDataArr)
 
-    const showContainer = document.querySelector('.show-box')
-    const gridContainer = document.querySelector('.grid-container')
-    const input = document.getElementById('search')
     input.addEventListener('input', () => search(input))
-    setNumberOfEpisodes(allEpisodes)
-    // allEpisodes.forEach((data) => renderElements(data, gridContainer))
+
     showDataArr.forEach((data) => renderShows(data, showContainer, showDataArr))
 
-    // Setting values for drop-down menus
     setShowsDropMenu(allShows)
-    setDropDownMenuAndScrollToElement(allEpisodes)
   } catch (error) {
     console.log(error)
   }
 }
+
+homeBtn.addEventListener('click', async () => {
+  const showData = await fetchShowInfo(showAPIs)
+  const showDataArr = [...showData]
+  deleteAllChildren(gridContainer)
+  deleteAllChildren(episodeSelector)
+  showDataArr.forEach((data) => renderShows(data, showContainer, showDataArr))
+  showContainer.style.display = 'block'
+  showSelector.value = ''
+  episodeSelector.value = ''
+  setNumberOfShows(showDataArr)
+  setNumberOfEpisodes
+})
 
 // Function to format the series number
 function formatSeriesNumber(number) {
   return number < 10 ? '0' + number : number
 }
 function setNumberOfShows(data) {
-  const numOfShows = document.querySelector('#number_of_shows')
-  numOfShows.innerHTML = `Displaying ${data.length}/${data.length} episodes`
+  numOfShows.innerHTML = `Displaying ${data.length}/${data.length} shows`
 }
 
 function setNumberOfEpisodes(dataArr) {
-  const numOfEpisodes = document.querySelector('#number_of_episodes')
   numOfEpisodes.innerHTML = `Displaying ${dataArr.length}/${dataArr.length} episodes`
 }
 // Function to search for episodes
@@ -90,14 +97,12 @@ function search({ value: inputValue }) {
     }
   })
 
-  const numOfEpisodes = document.querySelectorAll('#number_of_episodes')
   numOfEpisodes.forEach((el) => {
     el.innerHTML = `Displaying ${count}/${posts.length} episodes`
   })
 }
 
 function renderShows(data, parentElement, showsArr) {
-  const numOfEpisodes = document.querySelector('#number_of_episodes')
   numOfEpisodes.style.display = 'none'
   setNumberOfShows(showsArr)
   const showEl = Object.assign(document.createElement('div'), {
@@ -117,6 +122,7 @@ function renderShows(data, parentElement, showsArr) {
   })
 
   const showImage = Object.assign(document.createElement('img'), {
+    className: 'show-poster',
     src: data.image.medium,
   })
   const showDetails = Object.assign(document.createElement('div'), {
@@ -125,6 +131,7 @@ function renderShows(data, parentElement, showsArr) {
   const showRating = document.createElement('p')
   const showGenre = document.createElement('p')
   const showStatus = document.createElement('p')
+  const showRuntime = document.createElement('p')
   const showLanguage = document.createElement('p')
 
   showLink.innerHTML = data.name
@@ -133,6 +140,7 @@ function renderShows(data, parentElement, showsArr) {
   showStatus.innerHTML = `Status : ${data.status}`
   showLanguage.innerHTML = `Language : ${data.language}`
   showSummary.innerHTML = data.summary
+  showRuntime.innerHTML = `Runtime : ${data.runtime} min`
 
   parentElement.append(showEl)
   showEl.append(showImage)
@@ -144,13 +152,12 @@ function renderShows(data, parentElement, showsArr) {
   showDetails.append(showGenre)
   showDetails.append(showStatus)
   showDetails.append(showLanguage)
+  showDetails.append(showRuntime)
   showTitle.append(showLink)
 }
 
 // Function to render the elements on the page
 function renderElements(data, parentElement) {
-  const numOfShows = document.querySelector('#number_of_shows')
-  const numOfEpisodes = document.querySelector('#number_of_episodes')
   numOfShows.style.display = 'none'
   numOfEpisodes.style.display = 'inline'
   const dataEl = Object.assign(document.createElement('div'), {
@@ -175,7 +182,7 @@ function renderElements(data, parentElement) {
     console.log("Coudn't load image")
   }
   link.innerHTML = `${data.name} - S${formatSeriesNumber(
-    element.season
+    data.season
   )}E${formatSeriesNumber(data.number)}`
   // description.innerHTML = data.summary
   parentElement.append(dataEl)
@@ -192,33 +199,33 @@ function deleteAllChildren(parentEl) {
 }
 
 async function setShowsDropMenu(shows) {
-  const gridContainer = document.querySelector('.grid-container')
-  const select = document.querySelector('#show_selector')
-  const episodeSelector = document.querySelector('#episode_selector')
   shows.sort()
   shows.forEach((show) => {
     let option = document.createElement('option')
     option.setAttribute('value', show[1])
     option.innerHTML = show[0]
-    select.append(option)
+    showSelector.append(option)
   })
-  select.addEventListener('change', async () => {
-    console.log(`https://api.tvmaze.com/shows/${select.value}/episodes`)
+  showSelector.addEventListener('change', async () => {
+    console.log(`https://api.tvmaze.com/shows/${showSelector.value}/episodes`)
     let res = await fetch(
-      `https://api.tvmaze.com/shows/${select.value}/episodes`
+      `https://api.tvmaze.com/shows/${showSelector.value}/episodes`
     )
     let episodes = await res.json()
     console.log(episodes)
     deleteAllChildren(gridContainer)
     deleteAllChildren(episodeSelector)
-    episodes.forEach((episode) => renderElements(episode, gridContainer))
+    episodes.forEach((episode) => {
+      renderElements(episode, gridContainer)
+      showContainer.style.display = 'none'
+    })
+
     setDropDownMenuAndScrollToElement(episodes)
     setNumberOfEpisodes(episodes)
   })
 }
 
 function setDropDownMenuAndScrollToElement(episodes) {
-  const select = document.querySelector('#episode_selector')
   episodes.forEach((episode) => {
     let option = document.createElement('option')
     option.setAttribute(
@@ -230,15 +237,15 @@ function setDropDownMenuAndScrollToElement(episodes) {
     option.innerHTML = `${episode.name} - S${formatSeriesNumber(
       episode.season
     )}E${formatSeriesNumber(episode.number)}`
-    select.append(option)
+    episodeSelector.append(option)
   })
 
-  select.addEventListener('change', () => {
+  episodeSelector.addEventListener('change', () => {
     const episode = episodes.find(
       (episode) =>
         `S${formatSeriesNumber(episode.season)}E${formatSeriesNumber(
           episode.number
-        )}` === select.value
+        )}` === episodeSelector.value
     )
     const selectedEl = document.getElementById(`${episode.id}`)
     console.log(selectedEl)
