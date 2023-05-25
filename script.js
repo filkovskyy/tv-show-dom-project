@@ -16,6 +16,7 @@ const showAPIs = [
   'https://api.tvmaze.com/shows/179/episodes',
   'https://api.tvmaze.com/shows/528/episodes',
   'https://api.tvmaze.com/shows/590/episodes',
+  'http://api.tvmaze.com/shows/1?embed=cast',
 ]
 
 async function fetchEpisodes(api) {
@@ -83,6 +84,7 @@ function setNumberOfEpisodes(dataArr) {
 function search({ value: inputValue }) {
   const filter = inputValue.toUpperCase().trim()
   const posts = Array.from(document.querySelectorAll('.post-container'))
+  const shows = Array.from(document.querySelectorAll('.show-container'))
   let count = 0
 
   posts.forEach((post) => {
@@ -94,6 +96,18 @@ function search({ value: inputValue }) {
       count++
     } else {
       post.style.display = 'none'
+    }
+  })
+  console.log(shows)
+  shows.forEach((show) => {
+    const title = show.querySelector('.show-title')
+    const txtValue = title.textContent.trim()
+
+    if (txtValue.toUpperCase().includes(filter)) {
+      show.style.display = ''
+      count++
+    } else {
+      show.style.display = 'none'
     }
   })
 
