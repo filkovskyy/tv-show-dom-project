@@ -157,16 +157,15 @@ function renderShows(data, parentElement, showsArr) {
   showRuntime.innerHTML = `Runtime : ${data.runtime} min`
 
   parentElement.append(showEl)
-  showEl.append(showImage)
-  showEl.append(showDescription)
-  showEl.append(showDetails)
-  showDescription.append(showTitle)
-  showDescription.append(showSummary)
-  showDetails.append(showRating)
-  showDetails.append(showGenre)
-  showDetails.append(showStatus)
-  showDetails.append(showLanguage)
-  showDetails.append(showRuntime)
+  showEl.append(showImage, showDescription, showDetails)
+  showDescription.append(showTitle, showSummary)
+  showDetails.append(
+    showRating,
+    showGenre,
+    showStatus,
+    showLanguage,
+    showRuntime
+  )
   showTitle.append(showLink)
 }
 
@@ -200,10 +199,8 @@ function renderElements(data, parentElement) {
   )}E${formatSeriesNumber(data.number)}`
   // description.innerHTML = data.summary
   parentElement.append(dataEl)
-  dataEl.append(title)
+  dataEl.append(title, image, description)
   title.append(link)
-  dataEl.append(image)
-  dataEl.append(description)
 }
 
 function deleteAllChildren(parentEl) {
