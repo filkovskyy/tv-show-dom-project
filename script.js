@@ -8,15 +8,16 @@ const episodeSelector = document.querySelector('#episode_selector')
 const homeBtn = document.querySelector('#home_btn')
 
 const showAPIs = [
-  'https://api.tvmaze.com/shows/82/episodes',
-  'https://api.tvmaze.com/shows/527/episodes',
-  'https://api.tvmaze.com/shows/22036/episodes',
-  'https://api.tvmaze.com/shows/5/episodes',
-  'https://api.tvmaze.com/shows/583/episodes',
-  'https://api.tvmaze.com/shows/179/episodes',
-  'https://api.tvmaze.com/shows/528/episodes',
-  'https://api.tvmaze.com/shows/590/episodes',
-  'http://api.tvmaze.com/shows/1?embed=cast',
+  // 'https://api.tvmaze.com/shows/82/episodes',
+  // 'https://api.tvmaze.com/shows/527/episodes',
+  // 'https://api.tvmaze.com/shows/22036/episodes',
+  // 'https://api.tvmaze.com/shows/5/episodes',
+  // 'https://api.tvmaze.com/shows/583/episodes',
+  // 'https://api.tvmaze.com/shows/179/episodes',
+  // 'https://api.tvmaze.com/shows/528/episodes',
+  // 'https://api.tvmaze.com/shows/590/episodes',
+  // 'http://api.tvmaze.com/shows/1?embed=cast',
+  'https://api.tvmaze.com/shows',
 ]
 
 async function fetchEpisodes(api) {
@@ -41,32 +42,42 @@ async function fetchShowInfo(api) {
 
 async function setup() {
   try {
-    const showData = await fetchShowInfo(showAPIs)
-    const showDataArr = [...showData]
-    const allShows = showDataArr.map((show) => [show.name, show.id])
-    console.log(showDataArr)
+    // const showData = await fetchShowInfo(showAPIs)
+    fetch('https://api.tvmaze.com/shows')
+      .then((response) => response.json())
+      .then((showData) => {
+        const showDataArr = [...showData]
+        const allShows = showDataArr.map((show) => [show.name, show.id])
 
-    input.addEventListener('input', () => search(input))
+        input.addEventListener('input', () => search(input))
 
-    showDataArr.forEach((data) => renderShows(data, showContainer, showDataArr))
+        showDataArr.forEach((data) =>
+          renderShows(data, showContainer, showDataArr)
+        )
 
-    setShowsDropMenu(allShows)
+        setShowsDropMenu(allShows)
+      })
+      .catch((error) => console.log(error))
   } catch (error) {
     console.log(error)
   }
 }
 
-homeBtn.addEventListener('click', async () => {
-  const showData = await fetchShowInfo(showAPIs)
-  const showDataArr = [...showData]
-  deleteAllChildren(gridContainer)
-  deleteAllChildren(episodeSelector)
-  showDataArr.forEach((data) => renderShows(data, showContainer, showDataArr))
-  showContainer.style.display = 'block'
-  showSelector.value = ''
-  episodeSelector.value = ''
-  setNumberOfShows(showDataArr)
-  setNumberOfEpisodes
+homeBtn.addEventListener('click', () => {
+  fetch('https://api.tvmaze.com/shows')
+    .then((response) => response.json())
+    .then((showData) => {
+      const showDataArr = [...showData]
+      deleteAllChildren(gridContainer)
+      deleteAllChildren(episodeSelector)
+      showDataArr.forEach((data) =>
+        renderShows(data, showContainer, showDataArr)
+      )
+      showContainer.style.display = 'block'
+      showSelector.value = ''
+      episodeSelector.value = ''
+      setNumberOfShows(showDataArr)
+    })
 })
 
 // Function to format the series number
@@ -98,7 +109,6 @@ function search({ value: inputValue }) {
       post.style.display = 'none'
     }
   })
-  console.log(shows)
   shows.forEach((show) => {
     const title = show.querySelector('.show-title')
     const txtValue = title.textContent.trim()
@@ -218,12 +228,10 @@ async function setShowsDropMenu(shows) {
     showSelector.append(option)
   })
   showSelector.addEventListener('change', async () => {
-    console.log(`https://api.tvmaze.com/shows/${showSelector.value}/episodes`)
     let res = await fetch(
       `https://api.tvmaze.com/shows/${showSelector.value}/episodes`
     )
     let episodes = await res.json()
-    console.log(episodes)
     deleteAllChildren(gridContainer)
     deleteAllChildren(episodeSelector)
     episodes.forEach((episode) => {
@@ -259,7 +267,6 @@ function setDropDownMenuAndScrollToElement(episodes) {
         )}` === episodeSelector.value
     )
     const selectedEl = document.getElementById(`${episode.id}`)
-    console.log(selectedEl)
     try {
       selectedEl.scrollIntoView({ behavior: 'smooth' })
     } catch (err) {
